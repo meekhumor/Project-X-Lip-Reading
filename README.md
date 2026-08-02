@@ -193,12 +193,8 @@ pip install -r requirements.txt
 ```
 
 ### Download our trained models
-Download the trained model weights (`.h5`) and landmark predictor files (`.dat`) from Google Drive:
-- 🔗 **[Trained Models & Assets](https://drive.google.com/drive/folders/1bW7CQTLdUSTEX1er9y-81x0tKWQThBYo?usp=sharing)**
-
-Place the downloaded assets in their respective directories:
-- `shape_predictor_68_face_landmarks.dat` → `dataset_preprocessing/assets/`
-- Model weights (`.h5`) → `model_architecture/Saved Model/`
+Download the trained model weights (`.h5`) and landmark predictor files (`.dat`) from [here](https://drive.google.com/drive/folders/1bW7CQTLdUSTEX1er9y-81x0tKWQThBYo?usp=sharing).
+Place the downloaded assets in their respective directories.
 
 ### Run Live Detection (Words)
 Start the live detection application for word classification:
