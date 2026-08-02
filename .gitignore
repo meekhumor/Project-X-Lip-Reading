@@ -1,5 +1,4 @@
 
-# Large model/data files (too large for GitHub — store on Kaggle/Drive)
 *.dat
 *.h5
 *.hdf5

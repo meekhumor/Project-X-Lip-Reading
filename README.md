@@ -27,7 +27,7 @@
 
 ## About the Project
 
-This project focuses on developing a sophisticated lip-reading system that interprets spoken words from sequences of images. Using Haar Cascade classifiers for face extraction and dlib's facial landmark detection for lip extraction, we effectively preprocess the data. A train-test split ensures robust model evaluation. The core of the project is a hybrid model combining 3D CNNs, which capture spatial features, and LSTMs, which understand temporal dynamics. Extensive hyperparameter tuning enhances the model's accuracy. The system has been tested on online videos for accuracy and reliability and includes a live detection feature to showcase real-time capabilities.
+This project focuses on developing a sophisticated lip reading system that interprets spoken words from sequences of images. Using Haar Cascade classifiers for face extraction and dlib's facial landmark detection for lip extraction, we effectively preprocess the data. A train-test split ensures robust model evaluation. The core of the project is a hybrid model combining 3D CNNs, which capture spatial features, and LSTMs, which understand temporal dynamics. Extensive hyperparameter tuning enhances the model's accuracy. The system has been tested on online videos for accuracy and reliability and includes a live detection feature to showcase real-time capabilities.
 
 ## Results
 
@@ -120,11 +120,10 @@ Project X-Lip Reading/
 │   ├── Online_testing.ipynb
 │   ├── Precision.ipynb
 │   ├── Recall.ipynb
-│   ├── Live_detection.py               ← Words (v1)
-│   ├── live_detection_words.py         ← Words (v2, refactored)
-│   └── live_detection_phrases.py       ← Phrases
-├── Notes/
-├── lip_reading.tex                     ← Full technical notes
+│   ├── Live_detection.py               
+│   ├── live_detection_words.py         
+│   └── live_detection_phrases.py       
+├── Notes/                  
 └── README.md
 ```
 
@@ -192,6 +191,14 @@ Install the required Python packages:
 ```bash
 pip install -r requirements.txt
 ```
+
+### Download our trained models
+Download the trained model weights (`.h5`) and landmark predictor files (`.dat`) from Google Drive:
+- 🔗 **[Trained Models & Assets](https://drive.google.com/drive/folders/1bW7CQTLdUSTEX1er9y-81x0tKWQThBYo?usp=sharing)**
+
+Place the downloaded assets in their respective directories:
+- `shape_predictor_68_face_landmarks.dat` → `dataset_preprocessing/assets/`
+- Model weights (`.h5`) → `model_architecture/Saved Model/`
 
 ### Run Live Detection (Words)
 Start the live detection application for word classification:
