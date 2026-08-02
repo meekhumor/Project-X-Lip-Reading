@@ -1,0 +1,714 @@
+\documentclass[10pt, a4paper]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=0.60in, top=0.72in, bottom=0.72in]{geometry}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{amsmath, amssymb}
+\usepackage{fancyhdr}
+\usepackage{microtype}
+\usepackage{multicol}
+\usepackage{mdframed}
+\usepackage[hidelinks]{hyperref}
+
+% --- Monochromatic Color Palette ---
+\definecolor{monodark}{HTML}{111111}
+\definecolor{monomedium}{HTML}{3A3A3A}
+\definecolor{monolight}{HTML}{666666}
+\definecolor{monoline}{HTML}{CCCCCC}
+\definecolor{monoshade}{HTML}{F0F0F0}
+\definecolor{monobox}{HTML}{E8E8E8}
+
+% --- Typography & Spacing ---
+\setlist[itemize]{noitemsep, topsep=2pt, leftmargin=14pt}
+\setlist[enumerate]{noitemsep, topsep=2pt, leftmargin=14pt}
+\emergencystretch=4em
+
+% --- Code Box Style ---
+\newmdenv[
+  backgroundcolor=monoshade,
+  linecolor=monoline,
+  linewidth=0.5pt,
+  topline=true,
+  bottomline=true,
+  leftline=true,
+  rightline=true,
+  innerleftmargin=6pt,
+  innerrightmargin=6pt,
+  innertopmargin=4pt,
+  innerbottommargin=4pt,
+  skipabove=4pt,
+  skipbelow=4pt,
+]{codebox}
+
+% --- Section Headers ---
+\titleformat{\section}
+  {\color{monodark}\large\bfseries}
+  {\thesection.}{0.5em}{}
+  [\color{monoline}\titlerule]
+
+\titleformat{\subsection}
+  {\color{monomedium}\normalsize\bfseries}
+  {\thesubsection}{0.5em}{}
+
+\titleformat{\subsubsection}
+  {\color{monolight}\small\bfseries\itshape}
+  {}{0em}{}
+
+\titlespacing*{\section}{0pt}{10pt}{4pt}
+\titlespacing*{\subsection}{0pt}{7pt}{2pt}
+\titlespacing*{\subsubsection}{0pt}{5pt}{1pt}
+
+% --- Header and Footer ---
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\rfoot{\small\color{monolight} Page \thepage}
+
+% =============================================================
+\begin{document}
+% =============================================================
+
+% ---- TITLE BLOCK ----
+\begin{center}
+  {\Huge\bfseries\color{monodark} Project X --- Lip Reading}\\[5pt]
+  {\large\itshape\color{monomedium}
+    Visual Speech Recognition via 3D CNN \& Bidirectional LSTM on MIRACL-VC1
+  }\\[9pt]
+  \noindent\rule{\linewidth}{0.4pt}\\[6pt]
+\end{center}
+
+% ---- ABSTRACT ----
+\noindent\textbf{Abstract.}\quad
+Project X is a deep learning based visual speech recognition system that
+converts silent lip movements into text. The system applies a three-stage
+preprocessing pipeline --- face detection via Haar Cascade classifiers, lip
+region extraction via dlib's 68-point facial landmark model, and temporal
+frame sampling with zero-padding --- to transform raw webcam or video input
+into fixed-length grayscale lip sequences. A hybrid \textbf{3D CNN + Bidirectional
+LSTM} model then classifies those sequences into one of 10 words or 10
+phrases from the \textbf{MIRACL-VC1} dataset. This document provides a full
+technical specification: dataset structure, preprocessing algorithms, model
+architecture mathematics, training strategies, hyperparameter tuning,
+evaluation metrics, live detection pipeline, and future roadmap.
+
+\vspace{6pt}
+\noindent\rule{\linewidth}{0.4pt}
+\vspace{4pt}
+
+% ---- SWITCH TO TWO-COLUMN BODY ----
+\raggedcolumns
+\begin{multicols}{2}
+
+% ==========================================
+\section{Introduction \& Motivation}
+% ==========================================
+
+Hearing-impaired individuals, noisy-environment communication, surveillance
+systems, and silent speech interfaces all demand robust visual speech
+recognition. Traditional audio-based ASR fails completely when audio is
+absent or corrupted. Lip reading --- also called \textit{visual speech
+recognition} (VSR) --- addresses this by interpreting the spatio-temporal
+dynamics of lip movements.
+
+\subsection{Challenges in Lip Reading}
+\begin{itemize}
+  \item \textbf{Homophones:} Words like ``p'' and ``b'' are visually identical
+        (same lip shape, differ only in voicing).
+  \item \textbf{Speaker variability:} Different face sizes, skin tones, and
+        speaking styles.
+  \item \textbf{Temporal misalignment:} Variable speaking speeds across subjects.
+  \item \textbf{Occlusion \& lighting:} Real-world conditions degrade image quality.
+\end{itemize}
+
+\subsection{Project Goals}
+\begin{enumerate}
+  \item Build an end-to-end pipeline from webcam frames to word/phrase prediction.
+  \item Achieve robust preprocessing using classical CV (Haar Cascade + dlib).
+  \item Train a hybrid 3D CNN + BiLSTM model capturing spatial and temporal features.
+  \item Support real-time live detection at interactive frame rates.
+  \item Evaluate systematically using accuracy, precision, recall, and confusion matrices.
+\end{enumerate}
+
+% ==========================================
+\section{Complete Technology Stack}
+% ==========================================
+
+\begin{center}
+\small\color{monodark}
+\begin{tabular}{@{}p{1.8cm} p{4.4cm}@{}}
+\toprule
+\textbf{Layer} & \textbf{Technology} \\
+\midrule
+Language      & Python 3.10+ \\
+CV Library    & OpenCV (\texttt{cv2}) 4.x \\
+Face Model    & Haar Cascade (OpenCV XML) \\
+Landmark Det. & dlib 68-point predictor \\
+Resize Util   & imutils \\
+Image Proc.   & scikit-image (\texttt{skimage}) \\
+DL Framework  & TensorFlow 2.x / Keras \\
+Model Arch.   & 3D CNN + BiLSTM (Keras) \\
+Numerics      & NumPy, Matplotlib \\
+Serialization & Keras \texttt{.h5} model format \\
+Dataset       & MIRACL-VC1 (Kaggle) \\
+Notebooks     & Jupyter (experimentation) \\
+Tools         & Git, Google Colab \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ==========================================
+\section{Repository File Structure}
+% ==========================================
+
+The repository is restructured into clean, purpose-separated directories
+with \texttt{snake\_case} names for script compatibility.
+
+\subsection{Layout Mapping}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{@{}p{3.8cm} p{3.8cm}@{}}
+\toprule
+\textbf{Path} & \textbf{Description} \\
+\midrule
+\texttt{dataset\_preprocessing/} & Preprocessing pipeline \\
+\quad\texttt{01\_Face\_Extraction.ipynb} & Haar Cascade face crop \\
+\quad\texttt{02\_Lip\_Extraction.ipynb} & dlib landmark lip ROI \\
+\quad\texttt{03\_Train\_Test\_Split.ipynb} & Dataset splitting \\
+\quad\texttt{assets/} & Model assets (\texttt{.xml}, \texttt{.dat}) \\
+\texttt{model\_architecture/} & Model design \\
+\quad\texttt{architectures/} & Architecture experiments \\
+\quad\texttt{training\_techniques/} & Regularization \& optimizers \\
+\quad\texttt{Saved Model/} & Trained \texttt{.h5} weights \\
+\texttt{model\_evaluation/} & Inference \& metrics \\
+\quad\texttt{Accuracy.ipynb} & Accuracy curves \\
+\quad\texttt{Precision.ipynb} & Precision analysis \\
+\quad\texttt{Recall.ipynb} & Recall analysis \\
+\quad\texttt{Online\_testing.ipynb} & YouTube video testing \\
+\quad\texttt{live\_detection\_words.py} & Words inference \\
+\quad\texttt{live\_detection\_phrases.py} & Phrases inference \\
+\texttt{hyperparameter\_tuning/} & Search experiments \\
+\quad\texttt{grid\_search.ipynb} & Grid Search \\
+\quad\texttt{random\_search.ipynb} & Random Search \\
+\texttt{lip\_reading.tex} & This document \\
+\texttt{README.md} & Project overview \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ==========================================
+\section{Dataset: MIRACL-VC1}
+% ==========================================
+
+\textbf{MIRACL-VC1} (Multi-modal Isolated Recognition of Audio and Lip
+moving in Color and depth, version 1) is a benchmark dataset for visual
+speech recognition.
+
+\subsection{Dataset Composition}
+\begin{itemize}
+  \item \textbf{Subjects:} 15 speakers (varied demographics, accents).
+  \item \textbf{Modalities:} Color video + depth video (RGB-D, from Kinect).
+  \item \textbf{Utterances:} Each subject records each word/phrase 10 times.
+  \item \textbf{Resolution:} $640 \times 480$ at 15 fps.
+  \item \textbf{Format:} Sequences of \texttt{.png} frames per utterance.
+\end{itemize}
+
+\subsection{Vocabulary}
+
+\subsubsection{10 Words}
+\begin{codebox}
+\footnotesize
+\begin{verbatim}
+NULL, Begin, Choose, Connection,
+Navigation, Next, Previous, Start,
+Stop, Hello, Web
+\end{verbatim}
+\end{codebox}
+
+\subsubsection{10 Phrases}
+\begin{codebox}
+\footnotesize
+\begin{verbatim}
+Stop Navigation, Excuse me,
+I am sorry, Thank you, Good bye,
+I love this game, Nice to meet you,
+You are welcome, How are you,
+Have a good time
+\end{verbatim}
+\end{codebox}
+
+\subsection{Dataset Splits}
+Subjects 1--9 $\to$ \textbf{Train};
+Subjects 10--15 $\to$ \textbf{Test}.
+This speaker-independent split ensures the model generalises to
+\textit{unseen} individuals, not just unseen recordings of known speakers.
+
+% ==========================================
+\section{Preprocessing Pipeline}
+% ==========================================
+
+The pipeline converts raw video frames into fixed-size normalised
+grayscale lip sequences ready for model input.
+
+\subsection{Stage 1: Face Detection \& Extraction}
+\textbf{File:} \texttt{dataset\_preprocessing/01\_Face\_Extraction.ipynb}
+
+\subsubsection{Tool: Haar Cascade Classifier}
+OpenCV's pre-trained \texttt{haarcascade\_frontalface\_default.xml}
+implements the Viola-Jones algorithm.
+
+\subsubsection{Algorithm}
+\begin{enumerate}
+  \item Convert BGR frame to RGB.
+  \item Run cascade with \texttt{scaleFactor=1.3}, \texttt{minNeighbors=5}.
+  \item If faces detected, crop the \textbf{first} bounding box:
+\end{enumerate}
+\begin{codebox}
+\footnotesize
+\begin{verbatim}
+(x, y, w, h) = faces[0]
+face = image[y:y+h, x:x+w]
+\end{verbatim}
+\end{codebox}
+
+\subsubsection{Viola-Jones Feature Types}
+Four Haar feature types are evaluated at every scale and position
+using an integral image ($O(1)$ lookup):
+\begin{itemize}
+  \item Two-rectangle (horizontal / vertical)
+  \item Three-rectangle (centre-weighted)
+  \item Four-rectangle (diagonal)
+\end{itemize}
+
+\subsubsection{Integral Image}
+\begin{equation}
+I_\Sigma(x,y) = \sum_{x' \leq x,\; y' \leq y} I(x', y')
+\end{equation}
+Rectangle sum over any region $(x_1,y_1)\to(x_2,y_2)$:
+\begin{equation}
+\Sigma = I_\Sigma(x_2,y_2) - I_\Sigma(x_1,y_2)
+       - I_\Sigma(x_2,y_1) + I_\Sigma(x_1,y_1)
+\end{equation}
+
+\subsection{Stage 2: Lip Region Extraction}
+\textbf{File:} \texttt{dataset\_preprocessing/02\_Lip\_Extraction.ipynb}
+
+\subsubsection{Tool: dlib 68-Point Landmark Model}
+\texttt{shape\_predictor\_68\_face\_landmarks.dat} is a pre-trained
+regression-tree model that predicts 68 $(x, y)$ coordinates on the face.
+Points 48--67 define the mouth region.
+
+\subsubsection{Algorithm}
+\begin{enumerate}
+  \item Resize face crop to \texttt{width=56} px (speed optimisation).
+  \item Convert to grayscale.
+  \item Create a \texttt{dlib.rectangle} covering the full image.
+  \item Predict 68 landmarks; convert to NumPy array via
+        \texttt{face\_utils.shape\_to\_np()}.
+  \item Extract mouth landmark indices using
+        \texttt{FACIAL\_LANDMARKS\_IDXS['mouth']} $\to (i, j)$.
+  \item Compute tight bounding rect around mouth points:
+\end{enumerate}
+\begin{codebox}
+\footnotesize
+\begin{verbatim}
+(x,y,w,h) = cv2.boundingRect(
+    np.array([landmarks[i:j]]))
+lip = image[y-2:y+h+2, x-2:x+w+2]
+\end{verbatim}
+\end{codebox}
+\begin{enumerate}
+  \setcounter{enumi}{6}
+  \item Resize lip crop to \texttt{width=500} px with \texttt{INTER\_CUBIC}.
+  \item Convert to grayscale.
+\end{enumerate}
+
+\subsubsection{Landmark Index Map (mouth)}
+\begin{equation}
+\text{Outer lip: } 48 \to 59, \quad \text{Inner lip: } 60 \to 67
+\end{equation}
+
+\subsection{Stage 3: Frame Sampling, Resize \& Normalisation}
+
+\subsubsection{Temporal Sampling}
+Raw recordings vary in duration. A uniform sub-sampling strategy
+extracts a fixed number of frames:
+\begin{equation}
+N_{\text{frames}} = \min\!\bigl(\text{max\_f},\; \max(\text{min\_f},\;
+  \lfloor T / 10 \rfloor)\bigr)
+\end{equation}
+where $T$ is total frames, $\text{min\_f} = 8$, $\text{max\_f} = 28$.
+
+\begin{equation}
+\text{interval} = \max\!\left(1,\; \left\lfloor \frac{T}{N_{\text{frames}}} \right\rfloor\right)
+\end{equation}
+
+\subsubsection{Spatial Resize}
+Each lip frame is resized to $100 \times 100$ px using \texttt{skimage}:
+\begin{codebox}
+\footnotesize
+\begin{verbatim}
+frame = skimage.transform.resize(lip,(100,100))
+frame = (255 * frame).astype(np.uint8)
+\end{verbatim}
+\end{codebox}
+
+\subsubsection{Zero Padding}
+To reach a fixed sequence length of 28:
+\begin{equation}
+\text{pad} = 28 - N_{\text{valid}}, \quad
+\mathbf{0}_{100 \times 100} \times \text{pad}
+\end{equation}
+
+\subsubsection{Normalisation}
+Per-frame min-max normalisation prevents scale dominance:
+\begin{equation}
+\hat{x}_t = \frac{x_t - \min(x_t)}{\max(x_t) - \min(x_t)}
+\end{equation}
+\texttt{np.nan\_to\_num()} handles zero-division from blank padding frames.
+
+\subsubsection{Final Input Tensor}
+\begin{equation}
+\mathbf{X} \in \mathbb{R}^{1 \times 28 \times 100 \times 100 \times 1}
+\end{equation}
+Shape: batch $\times$ frames $\times$ height $\times$ width $\times$ channels.
+
+\columnbreak
+
+% ==========================================
+\section{Model Architecture}
+% ==========================================
+
+\textbf{Best model:} \texttt{architectures/3D\_CNN\_Bi-LSTM.ipynb} /
+\texttt{Saved Model/3D\_CNN\_Bi-LSTM.h5} ($\approx$18.4 MB)
+
+\subsection{Why 3D CNN?}
+A standard 2D CNN processes each frame independently, discarding temporal
+correlation. A 3D convolution applies a $k \times k \times k$ kernel across
+\textit{space} (H, W) and \textit{time} (T) simultaneously:
+
+\begin{equation}
+y[t,h,w] = \sum_{\tau}\sum_{i}\sum_{j}
+  K[\tau,i,j] \cdot x[t{+}\tau,\, h{+}i,\, w{+}j]
+\end{equation}
+
+\subsection{Why Bidirectional LSTM?}
+Standard LSTM only sees past context. A BiLSTM processes the sequence
+in both directions and concatenates hidden states:
+\begin{equation}
+\mathbf{h}_t = \left[\overrightarrow{\mathbf{h}}_t \;\|\; \overleftarrow{\mathbf{h}}_t\right]
+\end{equation}
+Critical for lip reading because some phoneme boundaries are only
+disambiguated by \textit{future} lip context (co-articulation).
+
+\subsection{Layer-by-Layer Architecture}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{@{}p{2.4cm} p{1.8cm} p{1.5cm}@{}}
+\toprule
+\textbf{Layer} & \textbf{Output Shape} & \textbf{Params} \\
+\midrule
+Input              & (28,100,100,1)     & 0 \\
+Conv3D(32,3,ReLU)  & (26,98,98,32)      & 896 \\
+MaxPool3D(2,2)     & (13,49,49,32)      & 0 \\
+Conv3D(64,3,ReLU)  & (11,47,47,64)      & 55,360 \\
+MaxPool3D(2,2)     & (5,23,23,64)       & 0 \\
+Conv3D(128,3,ReLU) & (3,21,21,128)      & 221,312 \\
+MaxPool3D(2,2)     & (1,10,10,128)      & 0 \\
+Reshape            & (1,12800)           & 0 \\
+BiLSTM(256)        & (1,512)             & $\sim$27.4M \\
+Flatten            & (512,)              & 0 \\
+Dropout(0.5)       & (512,)              & 0 \\
+Dense(256, ReLU)   & (256,)              & 131,328 \\
+Dense(11, Softmax) & (11,)               & 2,827 \\
+\midrule
+\multicolumn{2}{l}{\textbf{Total Trainable}} & $\approx$27.8M \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{3D CNN Block Equations}
+
+For layer $l$ with $F$ filters, kernel $\mathbf{K}^l$:
+\begin{equation}
+\mathbf{A}^l = \text{ReLU}\!\left(
+  \mathbf{K}^l * \mathbf{A}^{l-1} + \mathbf{b}^l
+\right), \quad \text{ReLU}(z) = \max(0,z)
+\end{equation}
+
+MaxPool3D halves spatial \& temporal dimensions with no parameters.
+
+\subsection{LSTM Cell Equations}
+
+\begin{align}
+\mathbf{f}_t &= \sigma(\mathbf{W}_f \mathbf{h}_{t-1} + \mathbf{U}_f \mathbf{x}_t + \mathbf{b}_f) \\
+\mathbf{i}_t &= \sigma(\mathbf{W}_i \mathbf{h}_{t-1} + \mathbf{U}_i \mathbf{x}_t + \mathbf{b}_i) \\
+\mathbf{o}_t &= \sigma(\mathbf{W}_o \mathbf{h}_{t-1} + \mathbf{U}_o \mathbf{x}_t + \mathbf{b}_o) \\
+\tilde{\mathbf{c}}_t &= \tanh(\mathbf{W}_c \mathbf{h}_{t-1} + \mathbf{U}_c \mathbf{x}_t + \mathbf{b}_c) \\
+\mathbf{c}_t &= \mathbf{f}_t \odot \mathbf{c}_{t-1} + \mathbf{i}_t \odot \tilde{\mathbf{c}}_t \\
+\mathbf{h}_t &= \mathbf{o}_t \odot \tanh(\mathbf{c}_t)
+\end{align}
+
+$\mathbf{f}_t$ (forget), $\mathbf{i}_t$ (input), $\mathbf{o}_t$ (output)
+are the three gates; $\sigma$ is sigmoid; $\odot$ is elementwise product.
+
+\subsection{Output: Softmax}
+
+\begin{equation}
+P(\hat{y} = k \mid \mathbf{x}) = \frac{e^{z_k}}{\displaystyle\sum_{j=1}^{K} e^{z_j}},
+\quad K \in \{11, 10\}
+\end{equation}
+Prediction: $\hat{y} = \arg\max_k P(k \mid \mathbf{x})$.
+
+% ==========================================
+\section{Training \& Regularization}
+% ==========================================
+
+\subsection{Loss: Categorical Cross-Entropy}
+
+\begin{equation}
+\mathcal{L} = -\sum_{k=1}^{K} y_k \log \hat{p}_k
+\end{equation}
+
+$y_k \in \{0,1\}$ is one-hot label; $\hat{p}_k$ is predicted probability.
+
+\subsection{Optimizers}
+
+\subsubsection{Adam}
+Adaptive Moment Estimation maintains first and second moment estimates:
+\begin{align}
+m_t &= \beta_1 m_{t-1} + (1-\beta_1)g_t \\
+v_t &= \beta_2 v_{t-1} + (1-\beta_2)g_t^2 \\
+\theta_t &= \theta_{t-1} - \frac{\eta}{\sqrt{\hat{v}_t}+\epsilon}\hat{m}_t
+\end{align}
+Default: $\eta=10^{-3}$, $\beta_1=0.9$, $\beta_2=0.999$, $\epsilon=10^{-8}$.
+
+\subsubsection{RMSprop}
+\begin{equation}
+E[g^2]_t = \rho E[g^2]_{t-1} + (1{-}\rho)g_t^2, \quad
+\theta_t = \theta_{t-1} - \frac{\eta}{\sqrt{E[g^2]_t + \epsilon}} g_t
+\end{equation}
+$\rho=0.9$ typical. Adam outperformed RMSprop on this task.
+
+\subsection{Dropout}
+Each neuron zeroed with probability $p$ during training:
+\begin{equation}
+\tilde{\mathbf{h}} = \mathbf{m} \odot \mathbf{h}, \quad
+m_i \sim \text{Bernoulli}(1-p)
+\end{equation}
+Rate $p = 0.5$ used in Dense block (inverted dropout at inference).
+
+\subsection{L1 \& L2 Regularisation}
+
+\subsubsection{L1 (Lasso) --- encourages sparsity}
+\begin{equation}
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{CE}} + \lambda \sum_i |w_i|
+\end{equation}
+
+\subsubsection{L2 (Ridge / Weight Decay)}
+\begin{equation}
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{CE}} + \frac{\lambda}{2} \sum_i w_i^2
+\end{equation}
+Gradient contribution $\lambda w_i$ uniformly shrinks all weights.
+L2 is smoother and more stable for deep networks.
+
+\subsection{Early Stopping}
+Monitors \texttt{val\_loss}; halts when no improvement for \texttt{patience} epochs:
+\begin{equation}
+\text{val\_loss}_{e} \geq \text{val\_loss}_{e - p}
+\quad \forall\; p \in [1, \text{patience}]
+\end{equation}
+Best weights from $e^*$ are restored. \texttt{patience=10} used.
+
+\subsection{Data Augmentation}
+Applied to lip frame sequences to increase effective dataset size:
+\begin{itemize}
+  \item Horizontal flip: $x \leftarrow W - 1 - x$
+  \item Brightness jitter: pixel scaling $\in [0.8, 1.2]$
+  \item Gaussian noise: $x \leftarrow x + \mathcal{N}(0,\sigma^2)$
+  \item Random crop: slight spatial shifts within lip region
+\end{itemize}
+
+% ==========================================
+\section{Hyperparameter Tuning}
+% ==========================================
+
+\subsection{Search Space}
+
+\begin{center}
+\scriptsize
+\begin{tabular}{@{}p{1.9cm} p{1.3cm} p{2.3cm}@{}}
+\toprule
+\textbf{Parameter} & \textbf{Type} & \textbf{Range / Options} \\
+\midrule
+Learning rate   & Continuous & $[10^{-4}, 10^{-2}]$ \\
+Dropout rate    & Continuous & $[0.3, 0.6]$ \\
+LSTM units      & Discrete   & $\{128, 256, 512\}$ \\
+Dense units     & Discrete   & $\{128, 256\}$ \\
+L2 $\lambda$    & Continuous & $[10^{-5}, 10^{-2}]$ \\
+Batch size      & Discrete   & $\{16, 32\}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Grid Search}
+Exhaustively evaluates every combination of a discrete grid.
+For $n$ parameters with $k$ values each: $O(k^n)$ evaluations.
+
+\subsection{Random Search}
+Samples $N$ random combinations. Empirically finds good configs
+with far fewer evaluations than grid search (Bergstra \& Bengio, 2012):
+\begin{equation}
+P(\text{finding } \epsilon\text{-optimal in }N\text{ trials})
+= 1 - (1 - \epsilon)^N
+\end{equation}
+
+\subsubsection{Best Configuration Found}
+\begin{codebox}
+\footnotesize
+\begin{verbatim}
+lr          = 1e-3    (Adam)
+dropout     = 0.5
+lstm_units  = 256     (BiLSTM -> 512)
+dense_units = 256
+l2_lambda   = 1e-4
+batch_size  = 32
+\end{verbatim}
+\end{codebox}
+
+% ==========================================
+\section{Model Evaluation}
+% ==========================================
+
+\subsection{Accuracy}
+\begin{equation}
+\text{Accuracy} = \frac{TP + TN}{TP + TN + FP + FN}
+\end{equation}
+Training/validation accuracy curves per epoch reveal overfitting when
+they diverge significantly.
+
+\subsection{Precision}
+\begin{equation}
+\text{Precision}_k = \frac{TP_k}{TP_k + FP_k}
+\end{equation}
+High precision: model predicts class $k$ only when confident.
+
+\subsection{Recall (Sensitivity)}
+\begin{equation}
+\text{Recall}_k = \frac{TP_k}{TP_k + FN_k}
+\end{equation}
+High recall: few actual class-$k$ samples are missed.
+
+\subsection{F1 Score}
+\begin{equation}
+F_1 = \frac{2 \cdot \text{Precision} \cdot \text{Recall}}
+           {\text{Precision} + \text{Recall}}
+\end{equation}
+
+\subsection{Confusion Matrix}
+A $K \times K$ matrix $\mathbf{C}$ where $C_{ij}$ counts samples of
+true class $i$ predicted as class $j$.
+Diagonal = correct; off-diagonal = errors.
+Commonly confused pairs reveal visually ambiguous (homophenic) words.
+
+\subsection{Online Testing}
+\textbf{File:} \texttt{model\_evaluation/Online\_testing.ipynb}
+
+Model evaluated on video clips from YouTube (real-world unseen speakers)
+to test generalisation beyond the MIRACL-VC1 distribution.
+
+% ==========================================
+\section{Live Detection System}
+% ==========================================
+
+\textbf{Files:} \texttt{live\_detection\_words.py},
+\texttt{live\_detection\_phrases.py}
+
+\subsection{End-to-End Pipeline}
+
+\begin{enumerate}
+  \item \textbf{Capture:} Open webcam via \texttt{cv2.VideoCapture(0)}.
+  \item \textbf{Control:} \texttt{SPACE} toggles recording; \texttt{ESC}
+        exits. Frames buffered into list.
+  \item \textbf{Frame sampling:} Apply Eq.\,(8) using $T = |\text{frames}|$.
+  \item \textbf{Face extraction:} Haar Cascade per sampled frame.
+  \item \textbf{Lip extraction:} dlib 68-landmark ROI crop.
+  \item \textbf{Resize \& pad:} $100 \times 100$ + zero-pad to 28 frames.
+  \item \textbf{Normalise:} Min-max per frame (Eq.\,10).
+  \item \textbf{Reshape:} $(1, 28, 100, 100, 1)$.
+  \item \textbf{Inference:} \texttt{loaded\_model.predict(sequence)}.
+  \item \textbf{Output:} Argmax class + confidence percentages printed.
+\end{enumerate}
+
+\subsection{Key Design Decisions}
+\begin{itemize}
+  \item \textbf{Flip display:} \texttt{cv2.flip(frame,1)} mirrors feed
+        (selfie-camera feel).
+  \item \textbf{Buffer copy:} \texttt{frames.append(frame.copy())} avoids
+        reference aliasing from rolling capture buffer.
+  \item \textbf{Skip on failure:} Frames where no face or lips are detected
+        are skipped gracefully, making pipeline robust to occlusions.
+  \item \textbf{Error handling:} All extraction steps wrapped in try/except
+        with informative console output.
+\end{itemize}
+
+% ==========================================
+\section{Architecture Variants Explored}
+% ==========================================
+
+\begin{center}
+\scriptsize
+\begin{tabular}{@{}p{2.5cm} p{2.2cm} p{1.0cm}@{}}
+\toprule
+\textbf{Architecture} & \textbf{Description} & \textbf{Val Acc} \\
+\midrule
+3D CNN              & 3D Conv, no RNN       & Low \\
+3D CNN (Scratch)    & Custom, no pretrain   & Low \\
+3D CNN + LSTM       & Unidirectional LSTM   & Medium \\
+3D CNN + BiLSTM     & Bidirectional LSTM    & \textbf{Best} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The BiLSTM consistently outperformed unidirectional LSTM due to its
+ability to leverage future lip context (co-articulation effects),
+which is crucial for distinguishing visually similar words.
+
+% ==========================================
+\section{Conclusion \& Future Scope}
+% ==========================================
+
+Project X demonstrates that combining classical CV preprocessing
+(Haar Cascade + dlib) with a deep hybrid architecture (3D CNN + BiLSTM)
+produces a functional real-time lip reading system. The modular, refactored
+repository structure facilitates further research and extension.
+
+\subsection{Future Directions}
+\begin{itemize}
+  \item \textbf{Sentence-level reading:} Use CTC or attention decoders
+        for continuous sentence recognition beyond isolated words.
+  \item \textbf{Multilingual support:} Train on multilingual corpora
+        (LRS2, LRS3) for broader applicability.
+  \item \textbf{Transformer backbone:} Replace BiLSTM with a Temporal
+        Transformer (e.g., LipFormer) for better long-range dependency.
+  \item \textbf{Larger datasets:} Train on LRW (500 words) or LRS3
+        (100k+ sentences) for production-grade generalisation.
+  \item \textbf{Audio-Visual fusion:} Combine lip features with audio
+        for robust AV-ASR in noisy environments.
+  \item \textbf{Edge deployment:} Quantize and export to ONNX / TFLite
+        for real-time inference on embedded devices.
+  \item \textbf{GUI interface:} Build live subtitle overlay for
+        accessibility applications.
+\end{itemize}
+
+\end{multicols}
+\end{document}

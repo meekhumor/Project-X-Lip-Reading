@@ -1,0 +1,11 @@
+
+# Large model/data files (too large for GitHub — store on Kaggle/Drive)
+*.dat
+*.h5
+*.hdf5
+*.pt
+*.pth
+*.onnx
+*.avi
+*.mp4
+*.pkl

@@ -1,4 +1,4 @@
-<h1 align="center"> Lip Reading 💬</h1>
+<h1 align="center"> Lip Reading: Visual Speech Recognition System</h1>
 
 
 <p align="center">
@@ -12,26 +12,26 @@
 
 <br />
 
-## 📑 Table of Contents
+## Table of Contents
 
-- [About the Project](#-about-the-project)
-- [Results](#-results)
-- [Tech Stack](#️-tech-stack)
-- [File Structure](#-file-structure)
-- [Dataset](#-dataset-miracl-vc1)
-- [Model Architecture](#-model-architecture)
-- [Installation and Setup](#-installation-and-setup)
-- [Future Scope](#-future-scope)
-- [Acknowledgements](#-acknowledgement)
-- [Contributors](#-contributors)
+- [About the Project](#about-the-project)
+- [Results](#results)
+- [Tech Stack](#tech-stack)
+- [File Structure](#file-structure)
+- [Dataset](#dataset-miracl-vc1)
+- [Model Architecture](#model-architecture)
+- [Installation and Setup](#installation-and-setup)
+- [Future Scope](#future-scope)
+- [Acknowledgements](#acknowledgement)
+- [Contributors](#contributors)
 
-## 📘 About the Project
+## About the Project
 
-This project focuses on developing a sophisticated lip-reading system that interprets spoken words from sequences of images. Using Haar Cascade classifiers for face extraction and dlib’s facial landmark detection for lip extraction, we effectively preprocess the data. A train-test split ensures robust model evaluation. The core of the project is a hybrid model combining 3D CNNs, which capture spatial features, and LSTMs, which understand temporal dynamics. Extensive hyperparameter tuning enhances the model’s accuracy. The system has been tested on online videos for accuracy and reliability and includes a live detection feature to showcase real-time capabilities.
+This project focuses on developing a sophisticated lip-reading system that interprets spoken words from sequences of images. Using Haar Cascade classifiers for face extraction and dlib's facial landmark detection for lip extraction, we effectively preprocess the data. A train-test split ensures robust model evaluation. The core of the project is a hybrid model combining 3D CNNs, which capture spatial features, and LSTMs, which understand temporal dynamics. Extensive hyperparameter tuning enhances the model's accuracy. The system has been tested on online videos for accuracy and reliability and includes a live detection feature to showcase real-time capabilities.
 
-## 📊 Results
+## Results
 
-### Live Deteection
+### Live Detection
 
 
 https://github.com/user-attachments/assets/e4759034-15ac-46fb-a6dc-9895173b556a
@@ -69,12 +69,10 @@ https://github.com/user-attachments/assets/e4759034-15ac-46fb-a6dc-9895173b556a
 <img src="https://github.com/user-attachments/assets/084ae834-7398-48e2-b3db-6bd9f5e279cb" alt="read-my-lips" width="250" />
 
 
-
-
-## ⚙️ Tech Stack
+## Tech Stack
 
 | **Category**                | **Technologies**                                                                                       |
-|-----------------------------|----------------------------------------------------------------------------------------------------|
+|-----------------------------|-----------------------------------------------------------------------------------------------------|
 | **Programming Languages**   | [![Python](https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)              |
 | **Frameworks**              | [![TensorFlow](https://img.shields.io/badge/tensorflow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/) [![Keras](https://img.shields.io/badge/keras-D00000?style=for-the-badge&logo=keras&logoColor=white)](https://keras.io/) |
 | **Libraries**               | [![OpenCV](https://img.shields.io/badge/opencv-5C3EE8?style=for-the-badge&logo=opencv&logoColor=white)](https://opencv.org/) [![NumPy](https://img.shields.io/badge/numpy-013243?style=for-the-badge&logo=numpy&logoColor=white)](https://numpy.org/)             |
@@ -84,62 +82,60 @@ https://github.com/user-attachments/assets/e4759034-15ac-46fb-a6dc-9895173b556a
 | **Visualization & Analysis**| [![Matplotlib](https://img.shields.io/badge/matplotlib-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://matplotlib.org/) [![Seaborn](https://img.shields.io/badge/seaborn-013243?style=for-the-badge&logo=python&logoColor=white)](https://seaborn.pydata.org/)                 |
 
 
-## 📁 File Structure
+## File Structure
 
-    ├── Dataset Preprocessing
-       ├── xml files
-          ├── haarcascade_frontalface_default.xml
-          ├── haarcascade_mcs_mouth.xml
-          ├── shape_predictor_68_face_landmarks.dat
-       ├── 01_Face_Extraction.ipynb
-       ├── 02_Lip_Extraction.ipynb
-       ├── 03_Train_Test_Split.ipynb
-    ├── Hyperparameter Tuning
-       ├── Grid Search.ipynb
-       ├── Random Search.ipynb
-    ├── Mini Projects
-       ├── Cat_Dog_Classifier_CNN.ipynb
-       ├── Human_Action_Recognition_LSTM.ipynb
-       ├── Next_Word_Predictor_LSTM.ipynb
-       ├── Video_Anomaly_Detection_CNN_LSTM.ipynb
-    ├── Model Architecture
-       ├── Saved Model
-          ├── 3D_CNN_Bi-LSTM.h5
-       ├── 3D_CNN.ipynb
-       ├── 3D_CNN_Bi-LSTM.ipynb
-       ├── 3D_CNN_From_Scratch.ipynb
-       ├── 3D_CNN_LSTM.ipynb
-       ├── Adam.ipynb
-       ├── CategoricalCrossentropy.ipynb
-       ├── Data_Augmentation.ipynb
-       ├── Dropout.ipynb
-       ├── EarlyStopping.ipynb
-       ├── L1_Regularization.ipynb
-       ├── L2_Regularization_1.ipynb
-       ├── L2_Regularization_2.ipynb
-       ├── RMSprop.ipynb
-    ├── Model Evaluation
-       ├── Accuracy.ipynb
-       ├── Live_Detection.ipynb
-       ├── Onlne_Testing.ipynb
-       ├── Precision.ipynb
-       ├── Recall.ipynb
-    ├── Notes
-       ├── LSTM
-       ├── OpenCV
-       ├── Om Mukherjee
-       ├── Sourish Phate       
-    ├── README.md
+```
+Project X-Lip Reading/
+├── dataset_preprocessing/
+│   ├── assets/
+│   │   ├── haarcascade_frontalface_default.xml
+│   │   ├── haarcascade_mcs_mouth.xml
+│   │   └── shape_predictor_68_face_landmarks.dat
+│   ├── 01_Face_Extraction.ipynb
+│   ├── 02_Lip_Extraction.ipynb
+│   └── 03_Train_Test_Split.ipynb
+├── hyperparameter_tuning/
+│   ├── grid_search.ipynb
+│   └── random_search.ipynb
+├── model_architecture/
+│   ├── architectures/
+│   │   ├── 3D_CNN.ipynb
+│   │   ├── 3D_CNN_Bi-LSTM.ipynb          ← Best model
+│   │   ├── 3D_CNN_From_Scratch.ipynb
+│   │   └── 3D_CNN_LSTM.ipynb
+│   ├── training_techniques/
+│   │   ├── Adam.ipynb
+│   │   ├── CategoricalCrossentropy.ipynb
+│   │   ├── Data_Augmentation.ipynb
+│   │   ├── Dropout.ipynb
+│   │   ├── EarlyStopping.ipynb
+│   │   ├── L1_Regularization.ipynb
+│   │   ├── L2_Regularization_1.ipynb
+│   │   ├── L2_Regularization_2.ipynb
+│   │   └── RMSprop.ipynb
+│   └── Saved Model/
+│       └── 3D_CNN_Bi-LSTM.h5
+├── model_evaluation/
+│   ├── Accuracy.ipynb
+│   ├── Online_testing.ipynb
+│   ├── Precision.ipynb
+│   ├── Recall.ipynb
+│   ├── Live_detection.py               ← Words (v1)
+│   ├── live_detection_words.py         ← Words (v2, refactored)
+│   └── live_detection_phrases.py       ← Phrases
+├── Notes/
+├── lip_reading.tex                     ← Full technical notes
+└── README.md
+```
 
-## 💾 Dataset: MIRACL-VC1
+## Dataset: MIRACL-VC1
 
 The **MIRACL-VC1** dataset is structured to facilitate research in visual speech recognition, particularly lip reading. Here's a breakdown of its structure and contents:
 
 #### Data Composition:
 - **Video Clips**: The dataset contains short video clips of multiple speakers reciting specific phrases. Each clip captures the upper body, focusing mainly on the face and mouth area.
-- **Speakers**: It features several speakers from diverse backgrounds, which helps models generalize across different individuals and speaking styles.
-- **Languages**: The dataset is typically in English, though speakers may vary in accents and pronunciations.
-- **Phrases**: Each video clip corresponds to one of a predefined set of phrases, which are recited by the speakers. The phrases are usually short and may cover simple daily expressions or numbers.
+- **Speakers**: 15 speakers from diverse backgrounds, which helps models generalize across different individuals and speaking styles.
+- **Languages**: English, with varied accents and pronunciations.
 
 #### Dataset Contains The Following Words and Phrases:
 
@@ -148,32 +144,33 @@ The **MIRACL-VC1** dataset is structured to facilitate research in visual speech
 [Download the MIRACL-VC1 dataset on Kaggle](https://www.kaggle.com/datasets/apoorvwatsky/miraclvc1)
 
 
-## 🤖 Model Architecture
+## Model Architecture
 
 ![276662464-b1a8a17b-da29-4424-9e5c-b3f51dd07a27](https://github.com/user-attachments/assets/08cbf766-8553-43ac-a3b7-5c987bce50b8)
 
+The final model is a hybrid **3D CNN + Bidirectional LSTM**:
+
 1. **3D Convolutional Neural Network (3D CNN)**:
-   Several convolutional layers are used, each followed by activation functions and pooling layers to reduce dimensionality while preserving essential features.
+   Three Conv3D layers (32→64→128 filters), each followed by ReLU activation and MaxPool3D. The 3D kernels capture joint spatio-temporal features across lip frames.
 
 2. **Reshape Layer**:
-   The tensor dimensions are adjusted to flatten the spatial data into a format that the LSTM can process.
+   Collapses the spatial dimensions into a flat feature vector per time step, bridging the 3D CNN output to the LSTM input.
 
-3. **Long Short-Term Memory (LSTM)**:
-   One or more LSTM layers are employed to process the sequential data, enabling the model to retain information over time and improve prediction accuracy.
+3. **Bidirectional LSTM (256 units → 512 output)**:
+   Processes the sequence both forward and backward, concatenating hidden states. This captures co-articulation effects — where future lip shape context disambiguates current phonemes.
 
 4. **Flatten Layer**:
-   This flattens the data without altering its values, preparing it for the next stage.
+   Prepares the LSTM output for the dense classification head.
 
-5. **Dropout Layer**:
-    A dropout rate is set (e.g., 0.5) to control the fraction of neurons dropped this prevents overfitting.
+5. **Dropout Layer (rate = 0.5)**:
+   Reduces overfitting by randomly zeroing half the neurons during training.
 
 6. **Dense Layers**:
-    One or more dense layers with activation functions (e.g., softmax for multi-class classification) are used to output the prediction probabilities.
-   
+   Dense(256, ReLU) → Dense(11 or 10, Softmax) for word or phrase classification.
 
 By combining these components, the model effectively learns to interpret lip movements, translating them into accurate predictions of spoken words.
 
-## 🛠️ Installation and Setup
+## Installation and Setup
 
 Follow these steps to set up the project environment and install necessary dependencies.
 
@@ -185,36 +182,47 @@ Ensure you have the following software installed:
 
 ### Clone the Repository
 Clone the project repository from GitHub:
-```
+```bash
 git clone https://github.com/sourishphate/Project-X-Lip-Reading.git
 cd Project-X-Lip-Reading
 ```
 
 ### Install Dependencies
 Install the required Python packages:
-```
+```bash
 pip install -r requirements.txt
 ```
-### Run the Application
-Start the live detection application using the following command:
+
+### Run Live Detection (Words)
+Start the live detection application for word classification:
+```bash
+python model_evaluation/live_detection_words.py
 ```
-python '.\Model Evaluation\Live_detection.py
+
+### Run Live Detection (Phrases)
+For phrase classification:
+```bash
+python model_evaluation/live_detection_phrases.py
 ```
 ### Troubleshooting
-If you encounter issues or want to suggest any improvements [raise an issue](https://github.com/sourishphate/Project-X-Lip-Reading/issues) on GitHub.
+If you encounter issues or want to suggest any improvements [raise an issue](https://github.com/meekhumor/Project-X-Lip-Reading/issues) on GitHub.
 
 
-## 🌟 Future Scope
+## Future Scope
 
 - **Multilingual Model**: Extend the current lip-reading model to support multiple languages, making it adaptable for a global audience and capable of handling diverse linguistic inputs.
 
 - **User Interface Development**: Design a user-friendly interface that allows real-time interaction with the lip-reading model, improving accessibility and practical usability.
 
-- **Sentence-Level Lip Reading**: Upgrade the model to read and interpret entire sentences, moving beyond word-level predictions to understand more complex speech patterns.
+- **Sentence Level Lip Reading**: Upgrade the model to read and interpret entire sentences, moving beyond word level predictions to understand more complex speech patterns using CTC or attention-based decoders.
 
-- **Large-Scale Model with Bigger Datasets**: Transition to a large-scale model by training with much larger datasets, which will boost the model’s ability to generalize across various lip movements, leading to greater accuracy.
+- **Transformer Backbone**: Replace the BiLSTM with a Temporal Transformer (LipFormer architecture) for improved long-range dependency modelling.
 
-## 📜 Acknowledgement
+- **Large-Scale Model with Bigger Datasets**: Transition to a large-scale model by training on LRW (500 words) or LRS3 (100k+ utterances), boosting generalisation across various lip movements.
+
+- **Audio-Visual Fusion**: Combine lip features with audio for robust AV-ASR performance in noisy environments.
+
+## Acknowledgement
 
 We would like to express our gratitude to all the tools and courses which helped in successful completion of this project.
 
@@ -229,13 +237,7 @@ We would like to express our gratitude to all the tools and courses which helped
 
 A special thanks to our project mentor [Veeransh Shah](https://github.com/Veeransh14) and to the entire [Project X](https://github.com/ProjectX-VJTI) community for unwavering support and guidance throughout this journey.
 
-## 👥 Contributors
+## Contributors
 
 - [Sourish Phate](https://github.com/sourishphate)
 - [Om Mukherjee](https://github.com/meekhumor)
-
-
-
-
-
-
