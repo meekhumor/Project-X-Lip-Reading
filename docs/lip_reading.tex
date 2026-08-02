@@ -78,7 +78,7 @@
 
 % ---- TITLE BLOCK ----
 \begin{center}
-  {\Huge\bfseries\color{monodark} Project X --- Lip Reading}\\[5pt]
+  {\Huge\bfseries\color{monodark} Lip Reading}\\[5pt]
   {\large\itshape\color{monomedium}
     Visual Speech Recognition via 3D CNN \& Bidirectional LSTM on MIRACL-VC1
   }\\[9pt]
@@ -89,9 +89,9 @@
 \noindent\textbf{Abstract.}\quad
 Project X is a deep learning based visual speech recognition system that
 converts silent lip movements into text. The system applies a three-stage
-preprocessing pipeline --- face detection via Haar Cascade classifiers, lip
+preprocessing pipeline face detection via Haar Cascade classifiers, lip
 region extraction via dlib's 68-point facial landmark model, and temporal
-frame sampling with zero-padding --- to transform raw webcam or video input
+frame sampling with zero-padding to transform raw webcam or video input
 into fixed-length grayscale lip sequences. A hybrid \textbf{3D CNN + Bidirectional
 LSTM} model then classifies those sequences into one of 10 words or 10
 phrases from the \textbf{MIRACL-VC1} dataset. This document provides a full
@@ -111,11 +111,11 @@ evaluation metrics, live detection pipeline, and future roadmap.
 \section{Introduction \& Motivation}
 % ==========================================
 
-Hearing-impaired individuals, noisy-environment communication, surveillance
+Hearing impaired individuals, noisy environment communication, surveillance
 systems, and silent speech interfaces all demand robust visual speech
-recognition. Traditional audio-based ASR fails completely when audio is
-absent or corrupted. Lip reading --- also called \textit{visual speech
-recognition} (VSR) --- addresses this by interpreting the spatio-temporal
+recognition. Traditional audio based ASR fails completely when audio is
+absent or corrupted. Lip reading also called \textit{visual speech
+recognition} (VSR) addresses this by interpreting the spatio-temporal
 dynamics of lip movements.
 
 \subsection{Challenges in Lip Reading}
@@ -136,73 +136,6 @@ dynamics of lip movements.
   \item Support real-time live detection at interactive frame rates.
   \item Evaluate systematically using accuracy, precision, recall, and confusion matrices.
 \end{enumerate}
-
-% ==========================================
-\section{Complete Technology Stack}
-% ==========================================
-
-\begin{center}
-\small\color{monodark}
-\begin{tabular}{@{}p{1.8cm} p{4.4cm}@{}}
-\toprule
-\textbf{Layer} & \textbf{Technology} \\
-\midrule
-Language      & Python 3.10+ \\
-CV Library    & OpenCV (\texttt{cv2}) 4.x \\
-Face Model    & Haar Cascade (OpenCV XML) \\
-Landmark Det. & dlib 68-point predictor \\
-Resize Util   & imutils \\
-Image Proc.   & scikit-image (\texttt{skimage}) \\
-DL Framework  & TensorFlow 2.x / Keras \\
-Model Arch.   & 3D CNN + BiLSTM (Keras) \\
-Numerics      & NumPy, Matplotlib \\
-Serialization & Keras \texttt{.h5} model format \\
-Dataset       & MIRACL-VC1 (Kaggle) \\
-Notebooks     & Jupyter (experimentation) \\
-Tools         & Git, Google Colab \\
-\bottomrule
-\end{tabular}
-\end{center}
-
-% ==========================================
-\section{Repository File Structure}
-% ==========================================
-
-The repository is restructured into clean, purpose-separated directories
-with \texttt{snake\_case} names for script compatibility.
-
-\subsection{Layout Mapping}
-
-\begin{center}
-\scriptsize
-\begin{tabular}{@{}p{3.8cm} p{3.8cm}@{}}
-\toprule
-\textbf{Path} & \textbf{Description} \\
-\midrule
-\texttt{dataset\_preprocessing/} & Preprocessing pipeline \\
-\quad\texttt{01\_Face\_Extraction.ipynb} & Haar Cascade face crop \\
-\quad\texttt{02\_Lip\_Extraction.ipynb} & dlib landmark lip ROI \\
-\quad\texttt{03\_Train\_Test\_Split.ipynb} & Dataset splitting \\
-\quad\texttt{assets/} & Model assets (\texttt{.xml}, \texttt{.dat}) \\
-\texttt{model\_architecture/} & Model design \\
-\quad\texttt{architectures/} & Architecture experiments \\
-\quad\texttt{training\_techniques/} & Regularization \& optimizers \\
-\quad\texttt{Saved Model/} & Trained \texttt{.h5} weights \\
-\texttt{model\_evaluation/} & Inference \& metrics \\
-\quad\texttt{Accuracy.ipynb} & Accuracy curves \\
-\quad\texttt{Precision.ipynb} & Precision analysis \\
-\quad\texttt{Recall.ipynb} & Recall analysis \\
-\quad\texttt{Online\_testing.ipynb} & YouTube video testing \\
-\quad\texttt{live\_detection\_words.py} & Words inference \\
-\quad\texttt{live\_detection\_phrases.py} & Phrases inference \\
-\texttt{hyperparameter\_tuning/} & Search experiments \\
-\quad\texttt{grid\_search.ipynb} & Grid Search \\
-\quad\texttt{random\_search.ipynb} & Random Search \\
-\texttt{lip\_reading.tex} & This document \\
-\texttt{README.md} & Project overview \\
-\bottomrule
-\end{tabular}
-\end{center}
 
 % ==========================================
 \section{Dataset: MIRACL-VC1}
@@ -287,7 +220,7 @@ using an integral image ($O(1)$ lookup):
   \item Three-rectangle (centre-weighted)
   \item Four-rectangle (diagonal)
 \end{itemize}
-
+\columnbreak
 \subsubsection{Integral Image}
 \begin{equation}
 I_\Sigma(x,y) = \sum_{x' \leq x,\; y' \leq y} I(x', y')
@@ -299,7 +232,6 @@ Rectangle sum over any region $(x_1,y_1)\to(x_2,y_2)$:
 \end{equation}
 
 \subsection{Stage 2: Lip Region Extraction}
-\textbf{File:} \texttt{dataset\_preprocessing/02\_Lip\_Extraction.ipynb}
 
 \subsubsection{Tool: dlib 68-Point Landmark Model}
 \texttt{shape\_predictor\_68\_face\_landmarks.dat} is a pre-trained
@@ -314,14 +246,13 @@ Points 48--67 define the mouth region.
   \item Predict 68 landmarks; convert to NumPy array via
         \texttt{face\_utils.shape\_to\_np()}.
   \item Extract mouth landmark indices using
-        \texttt{FACIAL\_LANDMARKS\_IDXS['mouth']} $\to (i, j)$.
+        Facial\_Landmarks\_Idxs['mouth'] $\to (i, j)$.
   \item Compute tight bounding rect around mouth points:
 \end{enumerate}
 \begin{codebox}
 \footnotesize
 \begin{verbatim}
-(x,y,w,h) = cv2.boundingRect(
-    np.array([landmarks[i:j]]))
+(x,y,w,h) = cv2.boundingRect(np.array([landmarks[i:j]]))
 lip = image[y-2:y+h+2, x-2:x+w+2]
 \end{verbatim}
 \end{codebox}
@@ -339,7 +270,7 @@ lip = image[y-2:y+h+2, x-2:x+w+2]
 \subsection{Stage 3: Frame Sampling, Resize \& Normalisation}
 
 \subsubsection{Temporal Sampling}
-Raw recordings vary in duration. A uniform sub-sampling strategy
+Raw recordings vary in duration. A uniform sub sampling strategy
 extracts a fixed number of frames:
 \begin{equation}
 N_{\text{frames}} = \min\!\bigl(\text{max\_f},\; \max(\text{min\_f},\;
@@ -369,7 +300,7 @@ To reach a fixed sequence length of 28:
 \end{equation}
 
 \subsubsection{Normalisation}
-Per-frame min-max normalisation prevents scale dominance:
+Per frame min max normalisation prevents scale dominance:
 \begin{equation}
 \hat{x}_t = \frac{x_t - \min(x_t)}{\max(x_t) - \min(x_t)}
 \end{equation}
@@ -386,9 +317,6 @@ Shape: batch $\times$ frames $\times$ height $\times$ width $\times$ channels.
 % ==========================================
 \section{Model Architecture}
 % ==========================================
-
-\textbf{Best model:} \texttt{architectures/3D\_CNN\_Bi-LSTM.ipynb} /
-\texttt{Saved Model/3D\_CNN\_Bi-LSTM.h5} ($\approx$18.4 MB)
 
 \subsection{Why 3D CNN?}
 A standard 2D CNN processes each frame independently, discarding temporal
@@ -413,7 +341,7 @@ disambiguated by \textit{future} lip context (co-articulation).
 
 \begin{center}
 \scriptsize
-\begin{tabular}{@{}p{2.4cm} p{1.8cm} p{1.5cm}@{}}
+\begin{tabular}{@{}p{3cm} p{2cm} p{1.5cm}@{}}
 \toprule
 \textbf{Layer} & \textbf{Output Shape} & \textbf{Params} \\
 \midrule
@@ -626,14 +554,12 @@ Commonly confused pairs reveal visually ambiguous (homophenic) words.
 Model evaluated on video clips from YouTube (real-world unseen speakers)
 to test generalisation beyond the MIRACL-VC1 distribution.
 
+\columnbreak
 % ==========================================
 \section{Live Detection System}
 % ==========================================
 
-\textbf{Files:} \texttt{live\_detection\_words.py},
-\texttt{live\_detection\_phrases.py}
-
-\subsection{End-to-End Pipeline}
+\subsection{End to End Pipeline}
 
 \begin{enumerate}
   \item \textbf{Capture:} Open webcam via \texttt{cv2.VideoCapture(0)}.
@@ -667,7 +593,7 @@ to test generalisation beyond the MIRACL-VC1 distribution.
 
 \begin{center}
 \scriptsize
-\begin{tabular}{@{}p{2.5cm} p{2.2cm} p{1.0cm}@{}}
+\begin{tabular}{@{}p{2.5cm} p{3cm} p{1.5cm}@{}}
 \toprule
 \textbf{Architecture} & \textbf{Description} & \textbf{Val Acc} \\
 \midrule
